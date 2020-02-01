@@ -1,6 +1,6 @@
 function routeDoNotExist(req, res, next) {
   res.status(404).send({
-    message: "This route does not exist"
+    message: "This route does not exist."
   });
   next();
 }
