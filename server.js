@@ -4,7 +4,7 @@ const io = require("socket.io")(http);
 require("./config/dotenv.config");
 
 io.on("connection", socket => {
-  socket.emit("dummy", " I ❤ la loma");
+  socket.emit("dummy", { message: "I ❤ la loma" });
   socket.on("clickme", data => {
     console.log(data);
     io.emit("dummy", data);
