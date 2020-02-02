@@ -6,6 +6,7 @@ require("./config/dotenv.config");
 io.on("connection", socket => {
   socket.emit("dummy", " I ❤ la loma");
   socket.on("clickme", data => {
+    console.log(data);
     io.emit("dummy", data);
   });
 });
