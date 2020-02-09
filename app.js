@@ -3,7 +3,7 @@ const app = express();
 
 const setUpRoutes = require("./routes");
 const setUpExpress = require("./config/express.config");
-const { routeDoNotExist } = require("./helpers");
+const { routeDoNotExist } = require("./utils/helpers");
 
 setUpExpress(app);
 setUpRoutes(app);
