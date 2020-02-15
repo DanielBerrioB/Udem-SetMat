@@ -8,6 +8,7 @@ const { verifyCode, addTeam } = require("./utils/sockets");
 
 io.on("connection", async socket => {
   socket.emit("main", { message: "I ❤ la loma." });
+  /*
   socket.on("joinRoom", async data => {
     //emitCodes(io);
 
@@ -29,6 +30,7 @@ io.on("connection", async socket => {
       });
     }
   });
+  */
 });
 
 http.listen(process.env.PORT, () => {
