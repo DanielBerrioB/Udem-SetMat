@@ -6,12 +6,11 @@ require("./config/dotenv.config");
 const { emitCodes } = require("./utils/helpers");
 const { verifyCode, addTeam } = require("./utils/sockets");
 
+//Sockets connection
 io.on("connection", async socket => {
   socket.emit("main", { message: "I ❤ la loma." });
-
   socket.on("joinRoom", async data => {
     //emitCodes(io);
-
     let res = await verifyCode(data.code);
     console.log(data, "ENTRA", res);
     if (res) {
