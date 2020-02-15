@@ -3,6 +3,13 @@ const { isThereAnyConnection } = require("../../utils/helpers");
 
 const collection = "categories";
 
+/**
+ * This function creates a new category.
+ * The parameters are name and description.
+ * The name will serve as a unique id
+ * @param {Object} req
+ * @param {Object} res
+ */
 function createCategories(req, res) {
   const { name, description } = req.body;
   if (name && description) {
@@ -49,6 +56,12 @@ function createCategories(req, res) {
   }
 }
 
+/**
+ * This function retrieve just one category given
+ * its name by parameter.
+ * @param {Object} req
+ * @param {Object} res
+ */
 function retrieveCategory(req, res) {
   const { name } = req.params;
   if (name) {
@@ -88,6 +101,12 @@ function retrieveCategory(req, res) {
   }
 }
 
+/**
+ * This function retrieves all the categories registered
+ * in the database.
+ * @param {Object} req
+ * @param {Object} res
+ */
 function retrieveCategories(req, res) {
   let fun = dataBase =>
     dataBase

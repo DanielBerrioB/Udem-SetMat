@@ -53,7 +53,7 @@ function retrieveConcept(req, res) {
   const { concept } = req.params;
   if (concept) {
     let fun = dataBase =>
-      dataBase.collection(collection).findOne({ concept }, (err, item) => {
+      dataBase.collection(collection).find({ concept }, (err, item) => {
         if (err) throw err;
         if (item) {
           res.status(200).send({

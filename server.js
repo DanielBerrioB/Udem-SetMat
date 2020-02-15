@@ -3,11 +3,31 @@ const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 require("./config/dotenv.config");
 
-io.on("connection", socket => {
-  socket.emit("dummy", { message: "I ❤ la loma" });
-  socket.on("clickme", data => {
-    console.log(data);
-    io.emit("dummy", data);
+const { emitCodes } = require("./utils/helpers");
+const { verifyCode, addTeam } = require("./utils/sockets");
+
+io.on("connection", async socket => {
+  socket.emit("main", { message: "I ❤ la loma." });
+  socket.on("joinRoom", async data => {
+    //emitCodes(io);
+
+    let res = await verifyCode(data.code);
+    console.log(data, "ENTRA", res);
+    if (res) {
+      let team = await addTeam(data.code, data.team);
+      if (team.status) {
+        team.message = "Equipo añadido";
+      } else {
+        team.message = "Error intenta de nuevo";
+      }
+      io.emit("main", team);
+    } else {
+      io.emit("main", {
+        message: "El código no es válido",
+        stutus: false,
+        team: []
+      });
+    }
   });
 });
 

@@ -1,3 +1,5 @@
+const { DBName, client } = require("../config/mongo.config");
+
 /**
  * This function checks if the current route exists, otherwise
  * it shows a message on the screen
@@ -25,4 +27,41 @@ function isThereAnyConnection(client) {
     : false;
 }
 
-module.exports = { routeDoNotExist, isThereAnyConnection };
+/**
+ * This function generates a unique code. Mostly is
+ * use to create a room with an id.
+ * @param {Int} length
+ */
+function generateRandomCode(length = 6) {
+  let result = "";
+  let characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+function emitCodes(io) {
+  client.connect(err => {
+    if (err) throw err;
+    const dataBase = client.db(DBName);
+    dataBase
+      .collection("concepts")
+      .find()
+      .toArray((err, items) => {
+        if (err) throw err;
+        items.forEach((el, i) => {
+          let value = el;
+          setTimeout(() => io.emit("dummy", value), 15000 * (i + 1));
+        });
+      });
+  });
+}
+
+module.exports = {
+  routeDoNotExist,
+  isThereAnyConnection,
+  emitCodes,
+  generateRandomCode
+};
