@@ -7,7 +7,7 @@ const roomCollection = "room";
  * This function verifies if the code is valid or not
  * @param {String} code
  */
-function verifyCode(code) {
+async function verifyCode(code) {
   const fun = dataBase =>
     new Promise(resolve =>
       dataBase
@@ -42,7 +42,7 @@ function verifyCode(code) {
  * @param {String} code
  * @param {Object} team
  */
-function addTeam(code, team) {
+async function addTeam(code, team) {
   let fun = dataBase =>
     new Promise(resolve =>
       dataBase
