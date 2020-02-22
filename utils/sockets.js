@@ -43,20 +43,25 @@ function verifyCode(code) {
  * @param {Object} team
  */
 function addTeam(code, team) {
-  let fun = dataBase =>
-    new Promise(resolve =>
+  //console.log(team)
+  let fun = async dataBase =>
+    new Promise(async resolve =>
       dataBase
         .collection(roomCollection)
         .updateOne(
           { uniqueCode: code },
           { $push: { teams: team } },
-          (err, item) => {
+          async (err, item) => {
             if (err) throw err;
-            if (item.result.n > 0) resolve({ status: true, team });
+            let currentTeams = await retrieveCurrentTeams(code)
+            //console.log(currentTeams.teams)
+            if (item.result.n > 0) resolve({ status: true, teams: currentTeams.teams[0].teams });
             else resolve({ status: false, team: [] });
           }
         )
     );
+
+
   return new Promise(async resolve => {
     if (isThereAnyConnection(client)) {
       const dataBase = client.db(DBName);
@@ -73,4 +78,31 @@ function addTeam(code, team) {
   });
 }
 
-module.exports = { verifyCode, addTeam };
+
+function retrieveCurrentTeams(uniqueCode) {
+  let fun = dataBase => new Promise(resolve => dataBase.collection(roomCollection).find({ uniqueCode }).toArray((err, result) => {
+    if (err) throw err
+    if (result.length > 0) {
+      resolve({ teams: result })
+    }
+  }))
+
+  return new Promise(async resolve => {
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      let teams = await fun(dataBase);
+      resolve({teams: teams.teams[0].teams});
+      console.log(teams.teams[0].teams)
+    } else {
+      return client.connect(async err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        let teams = await fun(dataBase);
+        console.log(teams)
+        resolve(teams);
+      });
+    }
+  })
+}
+
+module.exports = { verifyCode, addTeam, retrieveCurrentTeams };
