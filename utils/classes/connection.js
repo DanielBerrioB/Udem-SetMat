@@ -50,9 +50,10 @@ module.exports = class Connection {
     });
 
     socket.on("callTeams", async data => {
-      retrieveCurrentTeams(data).then(result =>
-        socket.emit("getTeams", result.teams)
-      );
+      retrieveCurrentTeams(data).then(result => {
+        socket.emit("getTeams", result.teams);
+        socket.broadcast.emit("getTeams", { Items: result.teams });
+      });
     });
 
     socket.on("onDisconnectTeam", async data => {
