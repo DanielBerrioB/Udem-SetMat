@@ -1,5 +1,5 @@
-const { DBName, client } = require("../config/mongo.config");
-const { isThereAnyConnection } = require("./helpers");
+const { DBName, client } = require("../../config/mongo.config");
+const { isThereAnyConnection } = require("../helpers");
 
 const roomCollection = "room";
 
@@ -112,4 +112,45 @@ function retrieveCurrentTeams(uniqueCode) {
   });
 }
 
-module.exports = { verifyCode, addTeam, retrieveCurrentTeams };
+/**
+ * This function deletes a team given its name.
+ * @param {String} name
+ */
+function deleteATeam(name) {
+  let fun = dataBase =>
+    new Promise(resolve =>
+      dataBase.collection(roomCollection).deleteOne({ name }, (err, item) => {
+        if (err) throw err;
+        if (item.result.n > 1) {
+          resolve({
+            status: true,
+            message: `El equipo ${name} se ha retirado de la sala`,
+            team: name
+          });
+        } else {
+          resolve({
+            status: false,
+            message: `Error`,
+            team: ""
+          });
+        }
+      })
+    );
+
+  return new Promise(async resolve => {
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      let deleted = await fun(dataBase);
+      resolve(deleted);
+    } else {
+      client.connect(async err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        let deleted = await fun(dataBase);
+        resolve(deleted);
+      });
+    }
+  });
+}
+
+module.exports = { verifyCode, addTeam, retrieveCurrentTeams, deleteATeam };

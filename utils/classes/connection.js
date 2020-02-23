@@ -1,10 +1,19 @@
-const { verifyCode, addTeam, retrieveCurrentTeams } = require("../sockets");
+const {
+  verifyCode,
+  addTeam,
+  retrieveCurrentTeams,
+  deleteATeam
+} = require("./sockets");
 
 module.exports = class Connection {
   constructor() {
     this.socket;
   }
 
+  /**
+   * Initialize the socket instance in order to use it all over
+   * life cycle
+   */
   async initEvents() {
     let connection = this;
     let socket = connection.socket;
@@ -43,6 +52,12 @@ module.exports = class Connection {
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result =>
         socket.emit("getTeams", result.teams)
+      );
+    });
+
+    socket.on("onDisconnectTeam", async data => {
+      deleteATeam(data).then(result =>
+        socket.emit("onDisconnectTeamResponse", result)
       );
     });
 
