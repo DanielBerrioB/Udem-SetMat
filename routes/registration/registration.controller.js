@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const { DBName, client } = require("../../config/mongo.config");
+const ObjectId = require("mongodb").ObjectID;
 const { isThereAnyConnection } = require("../../utils/helpers");
 const { createToken } = require("../../utils/auth");
 
@@ -120,4 +121,52 @@ function logIn(req, res) {
   }
 }
 
-module.exports = { logIn, createUser };
+/**
+ * This function retrieves the info of a user given
+ * its ObjectId
+ * @param {Object} req
+ * @param {Object} res
+ */
+function getUserInfo(req, res) {
+  let { id } = req.params;
+  if (id) {
+    let fun = dataBase =>
+      dataBase
+        .collection(collection)
+        .findOne({ _id: ObjectId(id) }, (err, item) => {
+          if (err) throw err;
+          if (item) {
+            delete item.password;
+            res.status(200).send({
+              status: true,
+              data: item,
+              message: `Usuario encontrado`
+            });
+          } else {
+            res.status(404).send({
+              status: false,
+              data: [],
+              message: `El usuario con id ${id} no se encuentra registrado`
+            });
+          }
+        });
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    } else {
+      client.connect(err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        fun(dataBase);
+      });
+    }
+  } else {
+    res.status(400).send({
+      status: false,
+      data: [],
+      message: "Necesitas el id del usuario"
+    });
+  }
+}
+
+module.exports = { logIn, createUser, getUserInfo };
