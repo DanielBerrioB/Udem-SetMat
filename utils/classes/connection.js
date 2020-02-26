@@ -8,6 +8,7 @@ const {
 module.exports = class Connection {
   constructor() {
     this.socket;
+    this.io;
   }
 
   /**
@@ -17,8 +18,9 @@ module.exports = class Connection {
   async initEvents() {
     let connection = this;
     let socket = connection.socket;
+    let io = connection.io;
 
-    socket.emit("main", { message: "Principal" });
+    socket.emit("main", { message: "Principal 23" });
 
     socket.on("joinRoom", async data => {
       let socketData = { code: data.split("|")[0], team: data.split("|")[1] };
@@ -34,7 +36,8 @@ module.exports = class Connection {
           } else {
             team.message = "Error intenta de nuevo";
           }
-          socket.emit("response", team);
+          io.emit("response", team);
+          io.emit("getWebTeams", currentTeams);
         } else {
           team.message = "Ya hay mas de seis equipos en la sala";
           team.team = [];

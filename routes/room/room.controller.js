@@ -12,21 +12,23 @@ const collection = "room";
  */
 function createRoom(req, res) {
   let { category } = req.body;
+
   if (category) {
     let uniqueCode = generateRandomCode();
+    console.log(category, uniqueCode);
     let fun = dataBase =>
       dataBase
         .collection(collection)
         .insertOne({ uniqueCode, category, teams: [] }, (err, item) => {
           if (err) throw err;
           if (item.result.n > 0) {
-            res.status(400).send({
+            res.status(201).send({
               status: true,
               data: { uniqueCode, category, teams: [] },
               message: "Sala creada"
             });
           } else {
-            res.status(400).send({
+            res.status(404).send({
               status: false,
               data: [],
               message: "Error no se pudo generar la sala"
@@ -44,6 +46,7 @@ function createRoom(req, res) {
       });
     }
   } else {
+    console.log("Error");
     res.status(400).send({
       status: false,
       data: [],

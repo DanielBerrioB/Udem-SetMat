@@ -8,6 +8,7 @@ const socketConnection = require("./utils/classes/connection");
 io.on("connection", async socket => {
   let socketInstance = new socketConnection();
   socketInstance.socket = socket;
+  socketInstance.io = io;
   socketInstance.initEvents();
 });
 
