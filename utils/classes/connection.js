@@ -54,8 +54,8 @@ module.exports = class Connection {
 
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result => {
-        io.emit("getTeams", result.teams);
-        io.broadcast.emit("getTeams", { Items: result.teams });
+        socket.emit("getTeams", result.teams);
+        socket.broadcast.emit("getTeams", { Items: result.teams });
       });
     });
 
