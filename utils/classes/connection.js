@@ -51,6 +51,7 @@ module.exports = class Connection {
 
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result => {
+        console.log("entra")
         socket.emit("getTeams", { Items: result.teams});
         socket.broadcast.emit("getTeams", { Items: result.teams });
       });
@@ -63,17 +64,10 @@ module.exports = class Connection {
     });
 
 
-    /*
+    
     socket.on("disconnect", async (data) => {
-      console.log(data + "ENTRA")
-      if (data !== null) {
-        deleteATeam(data).then(result =>
-          socket.emit("onDisconnectTeamResponse", result)
-        );
-      } else {
-        console.log("no se elimino nada")
-      }
+      console.log("desconectado")
     });
-    **/
+    
   }
 };
