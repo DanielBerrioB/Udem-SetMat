@@ -36,6 +36,7 @@ module.exports = class Connection {
           } else {
             team.message = "Error intenta de nuevo";
           }
+          currentTeams.teams.push({ team: socketData.team, score: 0 });
           io.emit("response", team);
           io.emit("getWebTeams", currentTeams);
         } else {
@@ -54,8 +55,8 @@ module.exports = class Connection {
 
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result => {
-        console.log("entra")
-        socket.emit("getTeams", { Items: result.teams});
+        console.log("entra");
+        socket.emit("getTeams", { Items: result.teams });
         socket.broadcast.emit("getTeams", { Items: result.teams });
       });
     });
@@ -66,11 +67,8 @@ module.exports = class Connection {
       );
     });
 
-
-    
-    socket.on("disconnect", async (data) => {
-      console.log("desconectado")
+    socket.on("disconnect", async data => {
+      console.log("desconectado");
     });
-    
   }
 };
