@@ -54,7 +54,8 @@ module.exports = class Connection {
 
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result => {
-        socket.emit("getTeams", result.teams);
+        console.log("entra")
+        socket.emit("getTeams", { Items: result.teams});
         socket.broadcast.emit("getTeams", { Items: result.teams });
       });
     });
@@ -65,8 +66,11 @@ module.exports = class Connection {
       );
     });
 
-    socket.on("disconnect", () => {
-      console.log("desconectado");
+
+    
+    socket.on("disconnect", async (data) => {
+      console.log("desconectado")
     });
+    
   }
 };
