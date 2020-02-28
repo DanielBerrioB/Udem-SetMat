@@ -28,13 +28,9 @@ module.exports = class Connection {
 
       if (res) {
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
-        /*
-        currentTeams = currentTeams
-          ? currentTeams.length > 0
-            ? currentTeams
-            : []
-          : [];
-          */
+
+        currentTeams = currentTeams.length > 0 ? currentTeams : [];
+
         let team = {};
         //let isRepeated = currentTeams.find(e => e.team === socketData.team);
         if (currentTeams.teams.length === 0) {
