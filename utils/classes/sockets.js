@@ -92,6 +92,8 @@ function retrieveCurrentTeams(uniqueCode) {
           if (err) throw err;
           if (result.length > 0) {
             resolve({ teams: result });
+          } else {
+            resolve({ teams: [] });
           }
         })
     );
