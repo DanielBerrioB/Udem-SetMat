@@ -118,14 +118,14 @@ function retrieveCurrentTeams(uniqueCode) {
  * This function deletes a team given its name.
  * @param {String} name
  */
-function deleteATeam(name) {
+function deleteATeam(code, name) {
   console.log(name);
   let fun = dataBase =>
     new Promise(resolve =>
       dataBase
         .collection(roomCollection)
         .update(
-          {},
+          { uniqueCode: code },
           { $pull: { teams: { team: name } } },
           { multi: true },
           (err, item) => {

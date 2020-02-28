@@ -62,7 +62,7 @@ module.exports = class Connection {
     });
 
     socket.on("onDisconnectTeam", async data => {
-      deleteATeam(data).then(result =>
+      deleteATeam(data.split("|")[0], data.split("|")[1]).then(result =>
         socket.emit("onDisconnectTeamResponse", result)
       );
     });
