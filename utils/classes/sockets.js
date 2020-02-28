@@ -124,7 +124,8 @@ function deleteATeam(name) {
     new Promise(resolve =>
       dataBase
         .collection(roomCollection)
-        .deleteOne(
+        .update(
+          {},
           { $pull: { teams: { team: name } } },
           { multi: true },
           (err, item) => {
