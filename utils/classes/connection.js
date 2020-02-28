@@ -5,6 +5,8 @@ const {
   deleteATeam
 } = require("./sockets");
 
+const { generateRandomCode } = require("../helpers");
+
 module.exports = class Connection {
   constructor() {
     this.socket;
@@ -21,22 +23,43 @@ module.exports = class Connection {
     let io = connection.io;
 
     socket.emit("main", { message: "Principal 23" });
+    socket.emit("connected", { id: generateRandomCode(10) });
 
     socket.on("joinRoom", async data => {
-      let socketData = { code: data.split("|")[0], team: data.split("|")[1] };
+      let teamData = data.split("|");
+      let socketData = {
+        code: teamData[0],
+        teamCode: teamData[1],
+        team: teamData[2]
+      };
       let res = await verifyCode(socketData.code);
 
       if (res) {
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
         let team = {};
-        if (currentTeams.teams.length < 6) {
-          team = await addTeam(socketData.code, socketData.team);
+        let isTeamAdded = currentTeams.teams.find(
+          e => e.teamId === socketData.teamCode
+        );
+
+        if (isTeamAdded) {
+          team.message = "El equipo ya se encuentra en la sala";
+          io.emit("response", team);
+        } else if (currentTeams.teams.length < 6) {
+          team = await addTeam(
+            socketData.code,
+            socketData.teamCode,
+            socketData.team
+          );
           if (team.status) {
             team.message = "Equipo añadido";
           } else {
             team.message = "Error intenta de nuevo";
           }
-          currentTeams.teams.push({ team: socketData.team, score: 0 });
+          currentTeams.teams.push({
+            teamId: socketData.teamCode,
+            team: socketData.team,
+            score: 0
+          });
           io.emit("response", team);
           io.emit("getWebTeams", currentTeams);
         } else {
@@ -55,7 +78,6 @@ module.exports = class Connection {
 
     socket.on("callTeams", async data => {
       retrieveCurrentTeams(data).then(result => {
-        console.log("entra");
         socket.emit("getTeams", { Items: result.teams });
         socket.broadcast.emit("getTeams", { Items: result.teams });
       });

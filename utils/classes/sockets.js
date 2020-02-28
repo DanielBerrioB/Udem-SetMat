@@ -42,24 +42,24 @@ function verifyCode(code) {
  * @param {String} code
  * @param {Object} team
  */
-function addTeam(code, team) {
+function addTeam(code, teamCode, team) {
   let fun = async dataBase =>
     new Promise(async resolve =>
-      dataBase
-        .collection(roomCollection)
-        .updateOne(
-          { uniqueCode: code },
-          { $push: { teams: { team, score: 0 } } },
-          async (err, item) => {
-            if (err) throw err;
-            if (item.result.n > 0)
-              resolve({
-                status: true,
-                teams: await retrieveCurrentTeams(code)
-              });
-            else resolve({ status: false, team: [] });
-          }
-        )
+      dataBase.collection(roomCollection).updateOne(
+        { uniqueCode: code },
+        {
+          $push: { teams: { teamId: teamCode, team, score: 0 } }
+        },
+        async (err, item) => {
+          if (err) throw err;
+          if (item.result.n > 0)
+            resolve({
+              status: true,
+              teams: await retrieveCurrentTeams(code)
+            });
+          else resolve({ status: false, team: [] });
+        }
+      )
     );
 
   return new Promise(async resolve => {
@@ -118,31 +118,22 @@ function retrieveCurrentTeams(uniqueCode) {
  * This function deletes a team given its name.
  * @param {String} name
  */
-function deleteATeam(code, name) {
-  console.log(name);
+function deleteATeam(code, teamCode) {
   let fun = dataBase =>
     new Promise(resolve =>
       dataBase
         .collection(roomCollection)
         .update(
           { uniqueCode: code },
-          { $pull: { teams: { team: name } } },
+          { $pull: { teams: { teamId: teamCode } } },
           { multi: true },
-          (err, item) => {
+          (err, _) => {
             if (err) throw err;
-            if (item.result.n > 1) {
-              resolve({
-                status: true,
-                message: `El equipo ${name} se ha retirado de la sala`,
-                team: name
-              });
-            } else {
-              resolve({
-                status: false,
-                message: `Error`,
-                team: ""
-              });
-            }
+            resolve({
+              status: true,
+              message: `El equipo se ha retirado de la sala`,
+              team: name
+            });
           }
         )
     );
