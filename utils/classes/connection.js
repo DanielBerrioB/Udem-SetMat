@@ -28,17 +28,9 @@ module.exports = class Connection {
 
       if (res) {
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
-
-        //currentTeams = currentTeams.length > 0 ? currentTeams : [];
-
         let team = {};
-        //let isRepeated = currentTeams.find(e => e.team === socketData.team);
-        if (currentTeams.teams.length === 0) {
-          team.message = "El equipo ya se encuentra registrado";
-          io.emit("response", team);
-        } else if (currentTeams.teams.length < 6) {
+        if (currentTeams.teams.length < 6) {
           team = await addTeam(socketData.code, socketData.team);
-          io.emit("response", team);
           if (team.status) {
             team.message = "Equipo añadido";
           } else {
