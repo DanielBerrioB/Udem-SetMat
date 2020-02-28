@@ -119,26 +119,31 @@ function retrieveCurrentTeams(uniqueCode) {
  * @param {String} name
  */
 function deleteATeam(name) {
+  console.log(name);
   let fun = dataBase =>
     new Promise(resolve =>
       dataBase
         .collection(roomCollection)
-        .deleteOne({ $pull: { teams: { team: name } } }, (err, item) => {
-          if (err) throw err;
-          if (item.result.n > 1) {
-            resolve({
-              status: true,
-              message: `El equipo ${name} se ha retirado de la sala`,
-              team: name
-            });
-          } else {
-            resolve({
-              status: false,
-              message: `Error`,
-              team: ""
-            });
+        .deleteOne(
+          { $pull: { teams: { team: name } } },
+          { multi: true },
+          (err, item) => {
+            if (err) throw err;
+            if (item.result.n > 1) {
+              resolve({
+                status: true,
+                message: `El equipo ${name} se ha retirado de la sala`,
+                team: name
+              });
+            } else {
+              resolve({
+                status: false,
+                message: `Error`,
+                team: ""
+              });
+            }
           }
-        })
+        )
     );
 
   return new Promise(async resolve => {
