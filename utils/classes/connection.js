@@ -50,6 +50,8 @@ module.exports = class Connection {
             socketData.teamCode,
             socketData.team
           );
+          delete team.teams;
+          team.team = socketData.teamCode;
           if (team.status) {
             team.message = "Equipo añadido";
           } else {
