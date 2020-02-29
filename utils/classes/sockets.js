@@ -52,12 +52,14 @@ function addTeam(code, teamCode, team) {
         },
         async (err, item) => {
           if (err) throw err;
-          if (item.result.n > 0)
+          if (item.result.n > 0) {
+            let currentTeams = await retrieveCurrentTeams(code);
+            currentTeams = currentTeams.teams.map(e => e.teamId);
             resolve({
               status: true,
-              teams: await retrieveCurrentTeams(code)
+              teams: currentTeams
             });
-          else resolve({ status: false, team: [] });
+          } else resolve({ status: false, team: [] });
         }
       )
     );

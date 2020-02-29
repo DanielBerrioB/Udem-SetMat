@@ -15,7 +15,7 @@ function createRoom(req, res) {
 
   if (category) {
     let uniqueCode = generateRandomCode();
-    console.log(category, uniqueCode);
+
     let fun = dataBase =>
       dataBase
         .collection(collection)
@@ -55,4 +55,26 @@ function createRoom(req, res) {
   }
 }
 
-module.exports = { createRoom };
+/**
+ * This funcion clears the DB
+ * DANGER: JUST USE IN CASE OF DELETING ALL THE ELEMENTS
+ */
+function deleteAllRooms(req, res) {
+  let fun = dataBase =>
+    dataBase.collection(collection).deleteMany({}, (err, _) => {
+      if (err) throw err;
+      res.status(200).send({ message: "Data removed" });
+    });
+  if (isThereAnyConnection(client)) {
+    const dataBase = client.db(DBName);
+    fun(dataBase);
+  } else {
+    client.connect(err => {
+      if (err) throw err;
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    });
+  }
+}
+
+module.exports = { createRoom, deleteAllRooms };
