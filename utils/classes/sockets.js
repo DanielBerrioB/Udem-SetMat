@@ -134,7 +134,7 @@ function deleteATeam(code, teamCode) {
             resolve({
               status: true,
               message: `El equipo se ha retirado de la sala`,
-              team: name
+
             });
           }
         )
