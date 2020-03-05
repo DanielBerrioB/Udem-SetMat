@@ -100,7 +100,7 @@ module.exports = class Connection {
     });
 
     socket.on("getQuestion", _ => {
-      fetch("http://localhost:5000/categories/retrieveConcepts")
+      fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
         .then(res => res.json())
         .then(result => {
           if (result.status) {
