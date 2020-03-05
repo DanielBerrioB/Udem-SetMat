@@ -87,12 +87,16 @@ module.exports = class Connection {
 
     socket.on("onDisconnectTeam", async data => {
       deleteATeam(data.split("|")[0], data.split("|")[1]).then(result => {
-        socket.emit("onDisconnectTeamResponse", result)
+        socket.emit("onDisconnectTeamResponse", result);
         retrieveCurrentTeams(data.split("|")[0]).then(result => {
           socket.emit("getTeams", { Items: result.teams });
           socket.broadcast.emit("getTeams", { Items: result.teams });
         });
       });
+    });
+
+    socket.on("startGame", data => {
+      socket.broadcast.emit("onStartGame", data);
     });
 
     socket.on("disconnect", async data => {
