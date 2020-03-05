@@ -4,21 +4,20 @@ const { isThereAnyConnection } = require("../../utils/helpers");
 const collection = "concepts";
 
 function createConcept(req, res) {
-  const { category, concept, definition, value } = req.body;
-  if (category && concept && definition && value) {
+  const { subject, concept, definition, img, categories } = req.body;
+  console.log(subject, concept, definition, img, categories);
+  if (subject && concept && definition && categories) {
     let fun = dataBase =>
       dataBase
         .collection(collection)
-        .updateOne(
-          { concept },
-          { $set: { category, definition, value } },
-          { upsert: true },
+        .insertOne(
+          { concept, subject, categories, definition, img },
           (err, item) => {
             if (err) throw err;
-            if (item.upsertedCount > 0) {
+            if (item.result.n > 0) {
               res.status(201).send({
                 status: true,
-                data: { category, concept, definition, value },
+                data: { subject, categories, concept, definition, img },
                 message: "Concepto creado con éxito"
               });
             } else {

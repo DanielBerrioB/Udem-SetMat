@@ -4,7 +4,7 @@ const {
   retrieveCurrentTeams,
   deleteATeam
 } = require("./sockets");
-
+const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
 
 module.exports = class Connection {
@@ -97,6 +97,19 @@ module.exports = class Connection {
 
     socket.on("startGame", data => {
       socket.broadcast.emit("onStartGame", data);
+    });
+
+    socket.on("getQuestion", _ => {
+      fetch("http://localhost:5000/categories/retrieveConcepts")
+        .then(res => res.json())
+        .then(result => {
+          if (result.status) {
+            socket.emit("sendQuestion", {
+              concepts: result.data[0],
+              time: 60000
+            });
+          }
+        });
     });
 
     socket.on("disconnect", async data => {
