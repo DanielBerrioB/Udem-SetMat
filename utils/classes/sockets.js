@@ -133,8 +133,7 @@ function deleteATeam(code, teamCode) {
             if (err) throw err;
             resolve({
               status: true,
-              message: `El equipo se ha retirado de la sala`,
-
+              message: `El equipo se ha retirado de la sala`
             });
           }
         )
