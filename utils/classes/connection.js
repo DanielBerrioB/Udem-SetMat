@@ -104,30 +104,34 @@ module.exports = class Connection {
         .then(res => res.json())
         .then(result => {
           if (result.status) {
-            var cont = 60;
-            var timer = setInterval(() => {
-              socket.emit("timer", cont);
-              socket.broadcast.emit("timer", cont);
-              cont--;
-            }, 1000);
+            result.data.forEach((e, i) => {
+              setTimeout(() => {
+                var cont = 60;
+                var timer = setInterval(() => {
+                  socket.emit("timer", cont);
+                  socket.broadcast.emit("timer", cont);
+                  cont--;
+                }, 1000);
 
-            setTimeout(() => {
-              clearInterval(timer);
-            }, 62000);
+                setTimeout(() => {
+                  clearInterval(timer);
+                }, 62000);
 
-            socket.emit("sendQuestion", {
-              Items: {
-                Items: result.data[0].categories
-              },
-              time: 60000,
-              body: result.data[0]
-            });
-            socket.broadcast.emit("sendQuestion", {
-              Items: {
-                Items: result.data[0].categories
-              },
-              time: 60000,
-              body: result.data[0]
+                socket.emit("sendQuestion", {
+                  Items: {
+                    Items: e.categories
+                  },
+                  time: 60000,
+                  body: e
+                });
+                socket.broadcast.emit("sendQuestion", {
+                  Items: {
+                    Items: e.categories
+                  },
+                  time: 60000,
+                  body: e
+                });
+              }, 15000 * (i + 1));
             });
           }
         });
