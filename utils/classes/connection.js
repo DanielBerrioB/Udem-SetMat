@@ -104,6 +104,21 @@ module.exports = class Connection {
         .then(res => res.json())
         .then(result => {
           if (result.status) {
+            socket.emit("sendQuestion", {
+              Items: {
+                Items: result.data[0].categories
+              },
+              time: 60000,
+              body: result.data[0]
+            });
+            socket.broadcast.emit("sendQuestion", {
+              Items: {
+                Items: result.data[0].categories
+              },
+              time: 60000,
+              body: result.data[0]
+            });
+            result.data.shift();
             result.data.forEach((e, i) => {
               setTimeout(() => {
                 var cont = 60;
