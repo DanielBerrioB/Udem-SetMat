@@ -59,9 +59,27 @@ function emitCodes(io) {
   });
 }
 
+/**
+ * This function acts like a count down
+ * @param {Int} seconds
+ */
+function timer(seconds = 60) {
+  var cont = seconds;
+  var timer = setInterval(() => {
+    socket.emit("timer", cont);
+    socket.broadcast.emit("timer", cont);
+    cont--;
+  }, 1000);
+
+  setTimeout(() => {
+    clearInterval(timer);
+  }, 62000);
+}
+
 module.exports = {
   routeDoNotExist,
   isThereAnyConnection,
   emitCodes,
-  generateRandomCode
+  generateRandomCode,
+  timer
 };

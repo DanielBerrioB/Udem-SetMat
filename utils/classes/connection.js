@@ -5,7 +5,7 @@ const {
   deleteATeam
 } = require("./sockets");
 const fetch = require("node-fetch");
-const { generateRandomCode } = require("../helpers");
+const { generateRandomCode, timer } = require("../helpers");
 
 module.exports = class Connection {
   constructor() {
@@ -104,48 +104,32 @@ module.exports = class Connection {
         .then(res => res.json())
         .then(result => {
           if (result.status) {
-            socket.emit("sendQuestion", {
-              Items: {
-                Items: result.data[0].categories
-              },
-              time: 60000,
-              body: result.data[0]
-            });
-            socket.broadcast.emit("sendQuestion", {
-              Items: {
-                Items: result.data[0].categories
-              },
-              time: 60000,
-              body: result.data[0]
-            });
+            let socketOnly = data =>
+              socket.emit("sendQuestion", {
+                Items: {
+                  Items: data.categories
+                },
+                time: 60000,
+                body: data
+              });
+            let socketBroadcast = data =>
+              socket.broadcast.emit("sendQuestion", {
+                Items: {
+                  Items: data.categories
+                },
+                time: 60000,
+                body: data
+              });
+
+            socketOnly(result.data[0]);
+            socketBroadcast(result.data[0]);
+            timer(60);
             result.data.shift();
             result.data.forEach((e, i) => {
+              timer(60);
               setTimeout(() => {
-                var cont = 60;
-                var timer = setInterval(() => {
-                  socket.emit("timer", cont);
-                  socket.broadcast.emit("timer", cont);
-                  cont--;
-                }, 1000);
-
-                setTimeout(() => {
-                  clearInterval(timer);
-                }, 62000);
-
-                socket.emit("sendQuestion", {
-                  Items: {
-                    Items: e.categories
-                  },
-                  time: 60000,
-                  body: e
-                });
-                socket.broadcast.emit("sendQuestion", {
-                  Items: {
-                    Items: e.categories
-                  },
-                  time: 60000,
-                  body: e
-                });
+                socketOnly(e);
+                socketBroadcast(e);
               }, 15000 * (i + 1));
             });
           }
