@@ -104,6 +104,12 @@ module.exports = class Connection {
         .then(res => res.json())
         .then(result => {
           if (result.status) {
+            socket.emit("sendQuestion", {
+              Items: {
+                concepts: result.data[0],
+                time: 60000
+              }
+            });
             socket.broadcast.emit("sendQuestion", {
               Items: {
                 concepts: result.data[0],
