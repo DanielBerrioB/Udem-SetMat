@@ -106,17 +106,17 @@ module.exports = class Connection {
           if (result.status) {
             socket.emit("sendQuestion", {
               Items: {
-                Items: result.data[0].categories,
-                time: 60000,
-                body: result.data[0]
-              }
+                Items: result.data[0].categories
+              },
+              time: 60000,
+              body: result.data[0]
             });
             socket.broadcast.emit("sendQuestion", {
               Items: {
-                Items: result.data[0].categories,
-                time: 60000,
-                body: result.data[0]
-              }
+                Items: result.data[0].categories
+              },
+              time: 60000,
+              body: result.data[0]
             });
           }
         });
