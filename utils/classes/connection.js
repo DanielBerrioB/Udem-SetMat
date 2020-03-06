@@ -104,6 +104,17 @@ module.exports = class Connection {
         .then(res => res.json())
         .then(result => {
           if (result.status) {
+            var cont = 60;
+            var timer = setInterval(() => {
+              socket.emit("timer", cont);
+              socket.broadcast.emit("timer", cont);
+              cont--;
+            }, 1000);
+
+            setTimeout(() => {
+              clearInterval(timer);
+            }, 62000);
+
             socket.emit("sendQuestion", {
               Items: {
                 Items: result.data[0].categories
