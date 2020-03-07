@@ -167,8 +167,9 @@ module.exports = class Connection {
     });
 
     socket.on("getScore", data => {
+      console.log(data);
       let myData = data.split("|");
-      addScore(myData[0], myData[1], myData[2]).then(res => {
+      addScore(myData[0], myData[1], parseInt(myData[2])).then(res => {
         socket.broadcast.emit("sendScore", res);
       });
     });
