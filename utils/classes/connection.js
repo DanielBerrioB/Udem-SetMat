@@ -2,7 +2,8 @@ const {
   verifyCode,
   addTeam,
   retrieveCurrentTeams,
-  deleteATeam
+  deleteATeam,
+  addScore
 } = require("./sockets");
 const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
@@ -118,6 +119,7 @@ module.exports = class Connection {
               time: 60000,
               body: result.data[0]
             });
+            /*
             var cont = 60;
             var timer = setInterval(() => {
               socket.emit("timer", cont);
@@ -159,8 +161,16 @@ module.exports = class Connection {
                 });
               }, 15000 * (i + 1));
             });
+            */
           }
         });
+    });
+
+    socket.on("getScore", data => {
+      let myData = data.split("|");
+      addScore(myData[0], myData[1], myData[2]).then(res => {
+        socket.broadcast.emit("sendScore", res);
+      });
     });
 
     socket.on("disconnect", async data => {

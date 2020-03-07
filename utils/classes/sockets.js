@@ -155,4 +155,58 @@ function deleteATeam(code, teamCode) {
   });
 }
 
-module.exports = { verifyCode, addTeam, retrieveCurrentTeams, deleteATeam };
+/**
+ * This function adds a new score to a Team
+ * @param {String} team
+ * @param {Int} score
+ */
+function addScore(code, teamCode, score) {
+  let fun = dataBase =>
+    new Promise(resolve =>
+      dataBase
+        .collection(roomCollection)
+        .updateOne(
+          { uniqueCode: code, "teams.teamId": teamCode },
+          { $set: { "teams.$.score": score } },
+          (err, item) => {
+            if (err) throw err;
+            if (item.result.n > 0) {
+              resolve({
+                status: true,
+                message: `Puntaje añadido`,
+                data: { code, teamCode, score }
+              });
+            } else {
+              resolve({
+                status: false,
+                message: `Puntaje no añadido`,
+                data: []
+              });
+            }
+          }
+        )
+    );
+
+  return new Promise(async resolve => {
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      let added = await fun(dataBase);
+      resolve(added);
+    } else {
+      client.connect(async err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        let added = await fun(dataBase);
+        resolve(added);
+      });
+    }
+  });
+}
+
+module.exports = {
+  verifyCode,
+  addTeam,
+  retrieveCurrentTeams,
+  deleteATeam,
+  addScore
+};

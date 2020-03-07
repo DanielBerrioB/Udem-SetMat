@@ -5,7 +5,7 @@ const collection = "concepts";
 
 function createConcept(req, res) {
   const { subject, concept, definition, img, categories } = req.body;
-  console.log(subject, concept, definition, img, categories);
+
   if (subject && concept && definition && categories) {
     let fun = dataBase =>
       dataBase

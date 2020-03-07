@@ -42,23 +42,6 @@ function generateRandomCode(length = 6) {
   return result;
 }
 
-function emitCodes(io) {
-  client.connect(err => {
-    if (err) throw err;
-    const dataBase = client.db(DBName);
-    dataBase
-      .collection("concepts")
-      .find()
-      .toArray((err, items) => {
-        if (err) throw err;
-        items.forEach((el, i) => {
-          let value = el;
-          setTimeout(() => io.emit("dummy", value), 15000 * (i + 1));
-        });
-      });
-  });
-}
-
 /**
  * This function acts like a count down
  * @param {Int} seconds
@@ -79,7 +62,6 @@ function timer(seconds = 60) {
 module.exports = {
   routeDoNotExist,
   isThereAnyConnection,
-  emitCodes,
   generateRandomCode,
   timer
 };

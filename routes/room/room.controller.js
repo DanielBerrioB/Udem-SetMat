@@ -24,7 +24,7 @@ function createRoom(req, res) {
           if (item.result.n > 0) {
             res.status(201).send({
               status: true,
-              data: { uniqueCode, category, teams: [] },
+              data: { uniqueCode, category, teams: [], availability: true },
               message: "Sala creada"
             });
           } else {
