@@ -3,7 +3,8 @@ const {
   addTeam,
   retrieveCurrentTeams,
   deleteATeam,
-  addScore
+  addScore,
+  shiftAssign
 } = require("./sockets");
 const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
@@ -23,7 +24,7 @@ module.exports = class Connection {
     let socket = connection.socket;
     let io = connection.io;
 
-    socket.emit("main", { message: "Principal 23" });
+    socket.emit("main", { message: "Loiter socket" });
     socket.emit("connected", { id: generateRandomCode(10) });
 
     socket.on("joinRoom", async data => {
@@ -100,24 +101,69 @@ module.exports = class Connection {
       socket.broadcast.emit("onStartGame", data);
     });
 
-    socket.on("getQuestion", _ => {
+    socket.on("getQuestion", async data => {
+      let basicData = data.split("|");
+      let currentTeams = await retrieveCurrentTeams(basicData[0]);
+      currentTeams = await currentTeams.json();
+
+      let teamCopy = [...currentTeams.teams];
+      let nextTeam = teamCopy.find(e => e.teamId === basicData[3]);
+      let answeredQuestions = [];
+
+      teamCopy.forEach(e => {
+        Array.prototype.push.apply(answeredQuestions, e.questions);
+      });
+      answeredQuestions = [...new Set(answeredQuestions)];
+
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
         .then(res => res.json())
-        .then(result => {
+        .then(async result => {
           if (result.status) {
+            let dummyQuestions = [];
+            let findQuestion;
+            if (basicData.length > 0) {
+              dummyQuestions = [...result.data];
+              dummyQuestions = dummyQuestions.map(e => e._id);
+
+              dummyQuestions = dummyQuestions.filter(
+                e => !answeredQuestions.includes(e)
+              ); //Questions available
+
+              if (teamCopy.indexOf(nextTeam) <= teamCopy.length - 1) {
+                await shiftAssign(
+                  nextTeam.teamId,
+                  basicData[0],
+                  dummyQuestions[0]
+                );
+              } else {
+                await shiftAssign(
+                  teamCopy[0].teamId,
+                  basicData[0],
+                  dummyQuestions[0]
+                );
+              }
+              findQuestion = result.data.find(e => e._id === dummyQuestions[0]);
+            }
+
             socket.emit("sendQuestion", {
               Items: {
-                Items: result.data[0].categories
+                Items:
+                  basicData.length > 0
+                    ? findQuestion.categories
+                    : result.data[0].categories
               },
               time: 60000,
-              body: result.data[0]
+              body: basicData.length > 0 ? findQuestion : result.data[0]
             });
             socket.broadcast.emit("sendQuestion", {
               Items: {
-                Items: result.data[0].categories
+                Items:
+                  basicData.length > 0
+                    ? findQuestion.categories
+                    : result.data[0].categories
               },
               time: 60000,
-              body: result.data[0]
+              body: basicData.length > 0 ? findQuestion : result.data[0]
             });
             /*
             var cont = 60;
@@ -167,7 +213,6 @@ module.exports = class Connection {
     });
 
     socket.on("getScore", data => {
-      console.log(data);
       let myData = data.split("|");
       addScore(myData[0], myData[1], parseInt(myData[2])).then(res => {
         socket.broadcast.emit("sendScore", res);
