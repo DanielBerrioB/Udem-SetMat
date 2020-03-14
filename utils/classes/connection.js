@@ -145,7 +145,7 @@ module.exports = class Connection {
               findQuestion = result.data.find(e => e._id === dummyQuestions[0]);
             }
 
-            socket.emit("sendQuestion", {
+            let bodySocket = {
               Items: {
                 Items:
                   basicData.length > 0
@@ -153,18 +153,16 @@ module.exports = class Connection {
                     : result.data[0].categories
               },
               time: 60000,
-              body: basicData.length > 0 ? findQuestion : result.data[0]
-            });
-            socket.broadcast.emit("sendQuestion", {
-              Items: {
-                Items:
-                  basicData.length > 0
-                    ? findQuestion.categories
-                    : result.data[0].categories
-              },
-              time: 60000,
-              body: basicData.length > 0 ? findQuestion : result.data[0]
-            });
+              body: basicData.length > 0 ? findQuestion : result.data[0],
+              idQuestion: findQuestion._id,
+              nextTeam:
+                teamCopy.indexOf(nextTeam) <= teamCopy.length - 1
+                  ? nextTeam.teamId
+                  : teamCopy[1].teamId
+            };
+
+            socket.emit("sendQuestion", bodySocket);
+            socket.broadcast.emit("sendQuestion", bodySocket);
             /*
             var cont = 60;
             var timer = setInterval(() => {
