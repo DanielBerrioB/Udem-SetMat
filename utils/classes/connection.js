@@ -110,8 +110,8 @@ module.exports = class Connection {
       let availableTeam = data.teams;
       let currentTeam;
 
-      if (availableTeam.length > 1) {
-        if (availableTeam || availableTeam.length === 0) {
+      if (availableTeam.length === 1 || availableTeam.length === 0) {
+        if (availableTeam.length === 0) {
           availableTeam = teamCopy;
         }
         currentTeam = availableTeam.shift();
