@@ -115,6 +115,9 @@ module.exports = class Connection {
           availableTeam = teamCopy;
         }
         currentTeam = availableTeam.shift();
+        if (availableTeam.length === 0) {
+          availableTeam = teamCopy;
+        }
       } else {
         currentTeam = availableTeam.shift();
         availableTeam = teamCopy;
@@ -145,7 +148,7 @@ module.exports = class Connection {
                 e => !answeredQuestions.includes(e)
               );
 
-              console.log(currentTeam);
+              console.log("entra", availableTeam);
               await shiftAssign(
                 currentTeam.teamId,
                 basicData[0],
