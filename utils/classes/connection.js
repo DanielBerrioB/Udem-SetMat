@@ -121,7 +121,7 @@ module.exports = class Connection {
         }
       } else {
         currentTeam = availableTeam.shift();
-        availableTeam = teamCopy;
+        //availableTeam = teamCopy;
       }
 
       availableTeam = availableTeam.filter(
