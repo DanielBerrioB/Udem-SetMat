@@ -131,10 +131,10 @@ module.exports = class Connection {
         availableTeam = teamCopy;
         currentTeam = availableTeam.shift().teamId;
       } else {
+        console.log(currentTeam);
         currentTeam = nextTeam ? nextTeam.teamId : teamCopy[0].teamId;
       }
 
-      console.log(availableTeam, data.teams);
       answeredQuestions = [...new Set(answeredQuestions)];
 
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
