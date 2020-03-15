@@ -109,9 +109,11 @@ module.exports = class Connection {
       let nextTeam = teamCopy.find(e => e.teamId === basicData[3]);
       let answeredQuestions = [];
 
-      let availableTeam = [];
+      data.teams.shift();
+      let availableTeam = data.teams;
       let currentTeam;
 
+      /*
       if (nextTeam && data.teams) {
         for (let i = 0; i < teamCopy.length; i++) {
           if (!data.teams.find(e => e.teamId === teamCopy[i].teamId)) {
@@ -119,6 +121,7 @@ module.exports = class Connection {
           }
         }
       }
+      */
 
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
@@ -130,7 +133,8 @@ module.exports = class Connection {
       } else {
         currentTeam = nextTeam ? nextTeam.teamId : teamCopy[0].teamId;
       }
-      console.log(currentTeam, availableTeam, data.teams);
+
+      console.log(availableTeam, data.teams);
       answeredQuestions = [...new Set(answeredQuestions)];
 
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
