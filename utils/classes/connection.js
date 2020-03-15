@@ -118,6 +118,7 @@ module.exports = class Connection {
         if (availableTeam.length === 0) {
           availableTeam = teamCopy;
         }
+        availableTeam.shift();
       } else {
         currentTeam = availableTeam.shift();
         availableTeam = teamCopy;
@@ -126,6 +127,8 @@ module.exports = class Connection {
       availableTeam = availableTeam.filter(
         e => e.teamId !== currentTeam.teamId
       );
+
+      console.log("entra ------ ", availableTeam, " ------------- ");
 
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
@@ -148,7 +151,6 @@ module.exports = class Connection {
                 e => !answeredQuestions.includes(e)
               );
 
-              console.log("entra", availableTeam);
               await shiftAssign(
                 currentTeam.teamId,
                 basicData[0],
