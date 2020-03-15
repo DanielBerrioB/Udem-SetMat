@@ -110,10 +110,11 @@ module.exports = class Connection {
       let answeredQuestions = [];
 
       let availableTeam = [];
+      let currentTeam;
 
       if (nextTeam && data.teams) {
         for (let i = 0; i < teamCopy.length; i++) {
-          if (!data.teams.find(teamCopy[i])) {
+          if (!data.teams.find(e => e.teamId === teamCopy[i].teamId)) {
             availableTeam = teamCopy[i];
           }
         }
@@ -125,7 +126,9 @@ module.exports = class Connection {
 
       if (availableTeam.length === 0) {
         availableTeam = teamCopy;
-        availableTeam.shift();
+        currentTeam = availableTeam.shift();
+      } else {
+        currentTeam = nextTeam ? nextTeam.teamId : teamCopy[0].teamId;
       }
 
       answeredQuestions = [...new Set(answeredQuestions)];
@@ -172,7 +175,7 @@ module.exports = class Connection {
               time: 60000,
               body: basicData.length > 0 ? findQuestion : result.data[0],
               idQuestion: findQuestion._id,
-              currentTeam: nextTeam ? nextTeam.teamId : teamCopy[0].teamId,
+              currentTeam: currentTeam,
               nextTeam: availableTeam[0].teamId,
               teams: [...availableTeam]
             };
