@@ -108,22 +108,19 @@ module.exports = class Connection {
       let teamCopy = [...currentTeams.teams];
       let nextTeam = teamCopy.find(e => e.teamId === basicData[3]);
       let answeredQuestions = [];
+      let availableTeam = [];
 
-      data.teams.shift();
-      let availableTeam = data.teams;
-      let currentTeam;
+      if (data.teams.length === 0) {
+        availableTeam = teamCopy;
+      } else {
+        availableTeam = data.teams;
+      }
+
+      let currentTeam = availableTeam.shift();
 
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
-
-      if (availableTeam.length === 0) {
-        availableTeam = teamCopy;
-        currentTeam = availableTeam.shift().teamId;
-      } else {
-        currentTeam = nextTeam ? nextTeam.teamId : availableTeam[0].teamId;
-        console.log(currentTeam);
-      }
 
       answeredQuestions = [...new Set(answeredQuestions)];
 
@@ -133,7 +130,6 @@ module.exports = class Connection {
           if (result.status) {
             let dummyQuestions = [];
             let findQuestion;
-            let teamIndex = teamCopy.indexOf(nextTeam);
 
             if (basicData.length > 0) {
               dummyQuestions = [...result.data];
@@ -143,19 +139,12 @@ module.exports = class Connection {
                 e => !answeredQuestions.includes(e)
               );
 
-              if (teamIndex < teamCopy.length - 1 && teamIndex >= 0) {
-                await shiftAssign(
-                  nextTeam.length >= 0 ? nextTeam.teamId : teamCopy[0].teamId,
-                  basicData[0],
-                  dummyQuestions[0]
-                );
-              } else {
-                await shiftAssign(
-                  teamCopy[0].teamId,
-                  basicData[0],
-                  dummyQuestions[0]
-                );
-              }
+              await shiftAssign(
+                currentTeam.teamId,
+                basicData[0],
+                dummyQuestions[0]
+              );
+
               findQuestion = result.data.find(e => e._id === dummyQuestions[0]);
             }
 
@@ -169,7 +158,7 @@ module.exports = class Connection {
               time: 60000,
               body: basicData.length > 0 ? findQuestion : result.data[0],
               idQuestion: findQuestion._id,
-              currentTeam: currentTeam,
+              currentTeam: currentTeam.teamId,
               nextTeam: availableTeam[0].teamId,
               teams: [...availableTeam].map(e => e)
             };
