@@ -111,7 +111,7 @@ module.exports = class Connection {
 
       let availableTeam = [];
 
-      if (nextTeam) {
+      if (nextTeam && data.teams) {
         for (let i = 0; i < teamCopy.length; i++) {
           if (!data.teams.find(teamCopy[i])) {
             availableTeam = teamCopy[i];
@@ -174,7 +174,7 @@ module.exports = class Connection {
               idQuestion: findQuestion._id,
               currentTeam: nextTeam ? nextTeam.teamId : teamCopy[0].teamId,
               nextTeam: availableTeam[0].teamId,
-              teams: availableTeam
+              teams: [...availableTeam]
             };
 
             console.log(availableTeam);
