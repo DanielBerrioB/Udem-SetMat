@@ -117,8 +117,8 @@ module.exports = class Connection {
         currentTeam = availableTeam.shift();
         if (availableTeam.length === 0) {
           availableTeam = teamCopy;
+          availableTeam.shift();
         }
-        availableTeam.shift();
       } else {
         currentTeam = availableTeam.shift();
         availableTeam = teamCopy;
