@@ -117,16 +117,13 @@ module.exports = class Connection {
         currentTeam = availableTeam.shift();
         if (availableTeam.length === 0) {
           availableTeam = teamCopy;
-          availableTeam.shift();
+          availableTeam = availableTeam.filter(
+            e => e.teamId !== currentTeam.teamId
+          );
         }
       } else {
         currentTeam = availableTeam.shift();
-        //availableTeam = teamCopy;
       }
-
-      availableTeam = availableTeam.filter(
-        e => e.teamId !== currentTeam.teamId
-      );
 
       console.log("entra ------ ", availableTeam, " ------------- ");
 
