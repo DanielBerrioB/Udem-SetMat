@@ -109,11 +109,17 @@ module.exports = class Connection {
       let answeredQuestions = [];
       let availableTeam = data.teams;
 
-      if (availableTeam.length === 0) {
+      if (availableTeam || availableTeam.length === 0) {
         availableTeam = teamCopy;
       }
 
       let currentTeam = availableTeam.shift();
+
+      if (availableTeam || availableTeam.length === 0) {
+        availableTeam = teamCopy;
+      }
+
+      availableTeam.shift();
 
       availableTeam = availableTeam.filter(
         e => e.teamId !== currentTeam.teamId
