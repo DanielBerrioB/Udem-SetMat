@@ -106,17 +106,18 @@ module.exports = class Connection {
       let currentTeams = await retrieveCurrentTeams(basicData[0]);
 
       let teamCopy = [...currentTeams.teams];
-      let nextTeam = teamCopy.find(e => e.teamId === basicData[3]);
       let answeredQuestions = [];
-      let availableTeam = [];
-
-      if (data.teams.length === 0) {
-        availableTeam = teamCopy;
-      } else {
-        availableTeam = data.teams;
-      }
+      let availableTeam = data.teams;
 
       let currentTeam = availableTeam.shift();
+
+      if (availableTeam.length === 0) {
+        availableTeam = teamCopy;
+      }
+
+      availableTeam = availableTeam.filter(
+        e => e.teamId !== currentTeam.teamId
+      );
 
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
