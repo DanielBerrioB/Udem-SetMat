@@ -108,18 +108,17 @@ module.exports = class Connection {
       let teamCopy = [...currentTeams.teams];
       let answeredQuestions = [];
       let availableTeam = data.teams;
+      let currentTeam;
 
-      if (availableTeam || availableTeam.length === 0) {
+      if (availableTeam.length > 1) {
+        if (availableTeam || availableTeam.length === 0) {
+          availableTeam = teamCopy;
+        }
+        currentTeam = availableTeam.shift();
+      } else {
+        currentTeam = availableTeam.shift();
         availableTeam = teamCopy;
       }
-
-      let currentTeam = availableTeam.shift();
-
-      if (availableTeam || availableTeam.length === 0) {
-        availableTeam = teamCopy;
-      }
-
-      availableTeam.shift();
 
       availableTeam = availableTeam.filter(
         e => e.teamId !== currentTeam.teamId
