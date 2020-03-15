@@ -130,7 +130,7 @@ module.exports = class Connection {
       } else {
         currentTeam = nextTeam ? nextTeam.teamId : teamCopy[0].teamId;
       }
-
+      console.log(currentTeam, availableTeam);
       answeredQuestions = [...new Set(answeredQuestions)];
 
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
@@ -177,10 +177,8 @@ module.exports = class Connection {
               idQuestion: findQuestion._id,
               currentTeam: currentTeam,
               nextTeam: availableTeam[0].teamId,
-              teams: [...availableTeam]
+              teams: [...availableTeam].map(e => e)
             };
-
-            console.log(availableTeam);
 
             socket.emit("sendQuestion", bodySocket);
             socket.broadcast.emit("sendQuestion", bodySocket);
