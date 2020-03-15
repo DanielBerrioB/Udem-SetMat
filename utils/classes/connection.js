@@ -173,7 +173,7 @@ module.exports = class Connection {
               body: basicData.length > 0 ? findQuestion : result.data[0],
               idQuestion: findQuestion._id,
               currentTeam: nextTeam ? nextTeam.teamId : teamCopy[0].teamId,
-              nextTeam: availableTeam[0],
+              nextTeam: availableTeam[0].teamId,
               teams: availableTeam
             };
 
