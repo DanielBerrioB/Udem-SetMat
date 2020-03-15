@@ -115,7 +115,7 @@ module.exports = class Connection {
       if (nextTeam && data.teams) {
         for (let i = 0; i < teamCopy.length; i++) {
           if (!data.teams.find(e => e.teamId === teamCopy[i].teamId)) {
-            availableTeam = teamCopy[i];
+            availableTeam.push(teamCopy[i]);
           }
         }
       }
@@ -130,7 +130,7 @@ module.exports = class Connection {
       } else {
         currentTeam = nextTeam ? nextTeam.teamId : teamCopy[0].teamId;
       }
-      console.log(currentTeam, availableTeam);
+      console.log(currentTeam, availableTeam, data.teams);
       answeredQuestions = [...new Set(answeredQuestions)];
 
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
