@@ -200,6 +200,13 @@ function addScore(code, teamCode, score) {
   });
 }
 
+/**
+ * This function assigns the team in the game, and
+ * saves a history of each team
+ * @param {String} teamCode
+ * @param {String} code
+ * @param {String} idQuestion
+ */
 function shiftAssign(teamCode, code, idQuestion) {
   let fun = dataBase =>
     new Promise(resolve =>
@@ -243,11 +250,57 @@ function shiftAssign(teamCode, code, idQuestion) {
   });
 }
 
+/**
+ * This function changes the state of a room to unavailable
+ * @param {String} code
+ */
+function changeRoomState(code) {
+  let fun = dataBase =>
+    new Promise(resolve =>
+      dataBase
+        .collection(roomCollection)
+        .updateOne(
+          { uniqueCode: code },
+          { $set: { availability: false } },
+          (err, item) => {
+            if (err) throw err;
+            if (item.result.n > 0) {
+              resolve({
+                status: true,
+                message: `Sala cerrada`
+              });
+            } else {
+              resolve({
+                status: false,
+                message: `Error intenta de nuevo`
+              });
+            }
+          }
+        )
+    );
+
+  return new Promise(async resolve => {
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      let added = await fun(dataBase);
+      resolve(added);
+    } else {
+      client.connect(async err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        let added = await fun(dataBase);
+        resolve(added);
+      });
+    }
+  });
+}
+
 module.exports = {
   verifyCode,
   addTeam,
   retrieveCurrentTeams,
   deleteATeam,
   addScore,
-  shiftAssign
+  shiftAssign,
+  changeRoomState
 };

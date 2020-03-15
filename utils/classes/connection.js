@@ -4,7 +4,8 @@ const {
   retrieveCurrentTeams,
   deleteATeam,
   addScore,
-  shiftAssign
+  shiftAssign,
+  changeRoomState
 } = require("./sockets");
 const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
@@ -125,8 +126,6 @@ module.exports = class Connection {
         currentTeam = availableTeam.shift();
       }
 
-      console.log("entra ------ ", availableTeam, " ------------- ");
-
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
@@ -183,6 +182,12 @@ module.exports = class Connection {
       addScore(myData[0], myData[1], parseInt(myData[2])).then(res => {
         socket.broadcast.emit("sendScore", res);
       });
+    });
+
+    socket.on("changeRoomState", data => {
+      changeRoomState(data).then(res =>
+        socket.broadcast.emit("changeRoomStateRes", res)
+      );
     });
 
     socket.on("disconnect", async data => {
