@@ -109,11 +109,11 @@ module.exports = class Connection {
       let answeredQuestions = [];
       let availableTeam = data.teams;
 
-      let currentTeam = availableTeam.shift();
-
       if (availableTeam.length === 0) {
         availableTeam = teamCopy;
       }
+
+      let currentTeam = availableTeam.shift();
 
       availableTeam = availableTeam.filter(
         e => e.teamId !== currentTeam.teamId
@@ -140,6 +140,7 @@ module.exports = class Connection {
                 e => !answeredQuestions.includes(e)
               );
 
+              console.log(currentTeam);
               await shiftAssign(
                 currentTeam.teamId,
                 basicData[0],
