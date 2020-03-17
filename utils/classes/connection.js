@@ -129,7 +129,6 @@ module.exports = class Connection {
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
-
       answeredQuestions = [...new Set(answeredQuestions)];
 
       fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
@@ -138,7 +137,6 @@ module.exports = class Connection {
           if (result.status) {
             let dummyQuestions = [];
             let findQuestion;
-
             if (basicData.length > 0) {
               dummyQuestions = [...result.data];
               dummyQuestions = dummyQuestions.map(e => e._id);
