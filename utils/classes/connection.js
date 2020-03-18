@@ -126,6 +126,12 @@ module.exports = class Connection {
         currentTeam = availableTeam.shift();
       }
 
+      console.log(
+        currentTeam.team,
+        " --- ",
+        availableTeam.map(e => e.team)
+      );
+
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
