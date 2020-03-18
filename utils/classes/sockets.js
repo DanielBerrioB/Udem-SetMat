@@ -235,17 +235,21 @@ function shiftAssign(teamCode, code, idQuestion) {
     );
 
   return new Promise(async resolve => {
-    if (isThereAnyConnection(client)) {
-      const dataBase = client.db(DBName);
-      let added = await fun(dataBase);
-      resolve(added);
-    } else {
-      client.connect(async err => {
-        if (err) throw err;
+    if (idQuestion) {
+      if (isThereAnyConnection(client)) {
         const dataBase = client.db(DBName);
         let added = await fun(dataBase);
         resolve(added);
-      });
+      } else {
+        client.connect(async err => {
+          if (err) throw err;
+          const dataBase = client.db(DBName);
+          let added = await fun(dataBase);
+          resolve(added);
+        });
+      }
+    } else {
+      resolve([]);
     }
   });
 }
