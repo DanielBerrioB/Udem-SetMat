@@ -98,25 +98,29 @@ function retrieveCurrentTeams(uniqueCode) {
     );
 
   return new Promise(async resolve => {
-    if (isThereAnyConnection(client)) {
-      const dataBase = client.db(DBName);
-      let teams = await fun(dataBase);
-      if (teams.teams) {
-        resolve({ teams: teams.teams[0].teams });
-      } else {
-        resolve({ teams: [] });
-      }
-    } else {
-      client.connect(async err => {
-        if (err) throw err;
+    if (uniqueCode) {
+      if (isThereAnyConnection(client)) {
         const dataBase = client.db(DBName);
         let teams = await fun(dataBase);
-        if (teams) {
+        if (teams.teams[0]) {
           resolve({ teams: teams.teams[0].teams });
         } else {
           resolve({ teams: [] });
         }
-      });
+      } else {
+        client.connect(async err => {
+          if (err) throw err;
+          const dataBase = client.db(DBName);
+          let teams = await fun(dataBase);
+          if (teams) {
+            resolve({ teams: teams.teams[0].teams });
+          } else {
+            resolve({ teams: [] });
+          }
+        });
+      }
+    } else {
+      resolve({ teams: [] });
     }
   });
 }
