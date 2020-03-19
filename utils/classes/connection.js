@@ -111,6 +111,10 @@ module.exports = class Connection {
       let availableTeam = data.teams;
       let currentTeam;
 
+      if (availableTeam.length === 0) {
+        availableTeam = teamCopy;
+      }
+      /*
       if (availableTeam.length === 1 || availableTeam.length === 0) {
         if (availableTeam.length === 0) {
           availableTeam = teamCopy;
@@ -125,6 +129,9 @@ module.exports = class Connection {
       } else {
         currentTeam = availableTeam.shift();
       }
+      */
+      currentTeam = availableTeam.shift();
+      availableTeam.push(currentTeam);
 
       console.log(
         currentTeam.team,
