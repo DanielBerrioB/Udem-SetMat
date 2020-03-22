@@ -116,30 +116,9 @@ module.exports = class Connection {
       if (availableTeam.length === 0) {
         availableTeam = teamCopy;
       }
-      /*
-      if (availableTeam.length === 1 || availableTeam.length === 0) {
-        if (availableTeam.length === 0) {
-          availableTeam = teamCopy;
-        }
-        currentTeam = availableTeam.shift();
-        if (availableTeam.length === 0) {
-          availableTeam = teamCopy;
-          availableTeam = availableTeam.filter(
-            e => e.teamId !== currentTeam.teamId
-          );
-        }
-      } else {
-        currentTeam = availableTeam.shift();
-      }
-      */
+
       currentTeam = availableTeam.shift();
       availableTeam.push(currentTeam);
-
-      console.log(
-        currentTeam.team,
-        " --- ",
-        availableTeam.map(e => e.team)
-      );
 
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
@@ -160,32 +139,41 @@ module.exports = class Connection {
                 e => !answeredQuestions.includes(e)
               );
 
-              await shiftAssign(
-                currentTeam.teamId,
-                basicData[0],
-                dummyQuestions[0]
-              );
+              if (dummyQuestions.length > 0) {
+                await shiftAssign(
+                  currentTeam.teamId,
+                  basicData[0],
+                  dummyQuestions[0]
+                );
 
-              findQuestion = result.data.find(e => e._id === dummyQuestions[0]);
+                findQuestion = result.data.find(
+                  e => e._id === dummyQuestions[0]
+                );
+              }
             }
 
-            let bodySocket = {
-              Items: {
-                Items:
-                  basicData.length > 0
-                    ? findQuestion.categories
-                    : result.data[0].categories
-              },
-              time: 60000,
-              body: basicData.length > 0 ? findQuestion : result.data[0],
-              idQuestion: findQuestion._id,
-              currentTeam: currentTeam.teamId,
-              nextTeam: availableTeam[0].teamId,
-              teams: [...availableTeam].map(e => e)
-            };
+            if (dummyQuestions.length > 0) {
+              let bodySocket = {
+                Items: {
+                  Items:
+                    basicData.length > 0
+                      ? findQuestion.categories
+                      : result.data[0].categories
+                },
+                time: 60000,
+                body: basicData.length > 0 ? findQuestion : result.data[0],
+                idQuestion: findQuestion._id,
+                currentTeam: currentTeam.teamId,
+                nextTeam: availableTeam[0].teamId,
+                teams: [...availableTeam].map(e => e)
+              };
 
-            socket.emit("sendQuestion", bodySocket);
-            socket.broadcast.emit("sendQuestion", bodySocket);
+              socket.emit("sendQuestion", bodySocket);
+              socket.broadcast.emit("sendQuestion", bodySocket);
+            } else {
+              socket.emit("gameOver", { exit: true });
+              socket.broadcast.emit("gameOver", { exit: true });
+            }
           }
         });
     });

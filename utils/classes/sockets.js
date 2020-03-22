@@ -102,7 +102,9 @@ function retrieveCurrentTeams(uniqueCode) {
       if (isThereAnyConnection(client)) {
         const dataBase = client.db(DBName);
         let teams = await fun(dataBase);
-        if (teams.teams[0]) {
+        if (teams.teams[0]
+          
+          ) {
           resolve({ teams: teams.teams[0].teams });
         } else {
           resolve({ teams: [] });
