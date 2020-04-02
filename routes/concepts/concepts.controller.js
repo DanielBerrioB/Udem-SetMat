@@ -49,25 +49,28 @@ function createConcept(req, res) {
 }
 
 function retrieveConcept(req, res) {
-  const { concept } = req.params;
-  if (concept) {
+  const { subject } = req.params;
+  if (subject) {
     let fun = dataBase =>
-      dataBase.collection(collection).find({ concept }, (err, item) => {
-        if (err) throw err;
-        if (item) {
-          res.status(200).send({
-            status: true,
-            data: item,
-            message: `Concepto encontrado`
-          });
-        } else {
-          res.status(400).send({
-            status: false,
-            data: [],
-            message: `No se encuentra el concepto ${concept}`
-          });
-        }
-      });
+      dataBase
+        .collection(collection)
+        .find({ subject })
+        .toArray((err, item) => {
+          if (err) throw err;
+          if (item.length > 0) {
+            res.status(200).send({
+              status: true,
+              data: item,
+              message: `Concepto encontrado`
+            });
+          } else {
+            res.status(400).send({
+              status: false,
+              data: [],
+              message: `No se encuentra el concepto ${subject}`
+            });
+          }
+        });
     if (isThereAnyConnection(client)) {
       const dataBase = client.db(DBName);
       fun(dataBase);
@@ -120,4 +123,39 @@ function retrieveConcepts(req, res) {
   }
 }
 
-module.exports = { createConcept, retrieveConcept, retrieveConcepts };
+function retrieveSubjects(req, res) {
+  let fun = dataBase =>
+    dataBase.collection(collection).distinct("subject", (err, item) => {
+      if (err) throw err;
+      if (item.length > 0) {
+        res.status(200).send({
+          status: true,
+          data: item,
+          message: `Subjects`
+        });
+      } else {
+        res.status(400).send({
+          status: false,
+          data: [],
+          message: `No se encuentro ninguna definicion`
+        });
+      }
+    });
+  if (isThereAnyConnection(client)) {
+    const dataBase = client.db(DBName);
+    fun(dataBase);
+  } else {
+    client.connect(err => {
+      if (err) throw err;
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    });
+  }
+}
+
+module.exports = {
+  createConcept,
+  retrieveConcept,
+  retrieveConcepts,
+  retrieveSubjects
+};

@@ -49,7 +49,46 @@ function createRoom(req, res) {
       });
     }
   } else {
-    console.log("Error");
+    res.status(400).send({
+      status: false,
+      data: [],
+      message: "No se han ingresado todos los campos"
+    });
+  }
+}
+
+function getRoomInfo(req, res) {
+  let { uniqueCode } = req.params;
+  if (uniqueCode) {
+    let fun = dataBase =>
+      dataBase.collection(collection).findOne({ uniqueCode }, (err, item) => {
+        if (err) throw err;
+        if (item) {
+          res.status(200).send({
+            status: true,
+            data: item,
+            message: "Sala encontrada"
+          });
+        } else {
+          res.status(404).send({
+            status: false,
+            data: [],
+            message: "Error no se pudo encontrar la sala"
+          });
+        }
+      });
+
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    } else {
+      client.connect(err => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        fun(dataBase);
+      });
+    }
+  } else {
     res.status(400).send({
       status: false,
       data: [],
@@ -80,4 +119,4 @@ function deleteAllRooms(req, res) {
   }
 }
 
-module.exports = { createRoom, deleteAllRooms };
+module.exports = { createRoom, deleteAllRooms, getRoomInfo };

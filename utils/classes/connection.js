@@ -171,8 +171,8 @@ module.exports = class Connection {
               socket.emit("sendQuestion", bodySocket);
               socket.broadcast.emit("sendQuestion", bodySocket);
             } else {
-              socket.emit("gameOver", { exit: true });
-              socket.broadcast.emit("gameOver", { exit: true });
+              socket.emit("gameOver", { exit: "Juego terminado" });
+              socket.broadcast.emit("gameOver", { exit: "Juego terminado" });
             }
           }
         });
