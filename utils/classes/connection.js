@@ -120,6 +120,8 @@ module.exports = class Connection {
       currentTeam = availableTeam.shift();
       availableTeam.push(currentTeam);
 
+      console.log(currentTeam, availableTeam);
+
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
