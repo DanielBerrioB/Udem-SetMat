@@ -120,8 +120,6 @@ module.exports = class Connection {
       currentTeam = availableTeam.shift();
       availableTeam.push(currentTeam);
 
-      console.log(currentTeam, availableTeam);
-
       teamCopy.forEach(e => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
@@ -188,8 +186,10 @@ module.exports = class Connection {
     });
 
     socket.on("onGameOver", data => {
-      socket.emit("gameOver", { exit: "Juego terminado" });
-      socket.broadcast.emit("gameOver", { exit: "Juego terminado" });
+      changeRoomState(data).then(_ => {
+        socket.emit("gameOver", { exit: "Juego terminado" });
+        socket.broadcast.emit("gameOver", { exit: "Juego terminado" });
+      });
     });
 
     socket.on("changeRoomState", data => {
