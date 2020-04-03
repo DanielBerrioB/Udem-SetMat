@@ -187,6 +187,11 @@ module.exports = class Connection {
       });
     });
 
+    socket.on("onGameOver", data => {
+      socket.emit("gameOver", { exit: "Juego terminado" });
+      socket.broadcast.emit("gameOver", { exit: "Juego terminado" });
+    });
+
     socket.on("changeRoomState", data => {
       changeRoomState(data).then(res =>
         socket.broadcast.emit("changeRoomStateRes", res)
