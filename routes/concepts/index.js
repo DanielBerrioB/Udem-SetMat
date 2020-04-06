@@ -3,9 +3,25 @@ const router = express.Router();
 const controller = require("./concepts.controller");
 const { validateToken } = require("../../utils/auth");
 
-router.post("/categories/createConcept", controller.createConcept);
-router.get("/categories/getSubjects", controller.retrieveSubjects);
-router.get("/categories/retrieveConcept/:subject", controller.retrieveConcept);
-router.get("/categories/retrieveConcepts", controller.retrieveConcepts);
+router.post(
+  "/categories/createConcept",
+  validateToken,
+  controller.createConcept
+);
+router.get(
+  "/categories/getSubjects",
+  validateToken,
+  controller.retrieveSubjects
+);
+router.get(
+  "/categories/retrieveConcept/:subject",
+  validateToken,
+  controller.retrieveConcept
+);
+router.get(
+  "/categories/retrieveConcepts",
+  validateToken,
+  controller.retrieveConcepts
+);
 
 module.exports = router;
