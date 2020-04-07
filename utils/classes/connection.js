@@ -206,8 +206,6 @@ module.exports = class Connection {
       );
     });
 
-    socket.on("disconnect", async (data) => {
-      console.log("desconectado");
-    });
+    socket.on("disconnect", () => {});
   }
 };
