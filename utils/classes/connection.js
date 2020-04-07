@@ -125,7 +125,6 @@ module.exports = class Connection {
       });
       answeredQuestions = [...new Set(answeredQuestions)];
 
-      console.log(data);
       fetch(
         `https://socket-udem.herokuapp.com/categories/retrieveConcept/${data.category}`,
         {
@@ -137,7 +136,6 @@ module.exports = class Connection {
       )
         .then((res) => res.json())
         .then(async (result) => {
-          console.log(result);
           if (result.status) {
             let dummyQuestions = [];
             let findQuestion;
