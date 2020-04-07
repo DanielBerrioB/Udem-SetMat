@@ -5,7 +5,7 @@ const {
   deleteATeam,
   addScore,
   shiftAssign,
-  changeRoomState
+  changeRoomState,
 } = require("./sockets");
 const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
@@ -28,12 +28,12 @@ module.exports = class Connection {
     socket.emit("main", { message: "Loiter socket" });
     socket.emit("connected", { id: generateRandomCode(10) });
 
-    socket.on("joinRoom", async data => {
+    socket.on("joinRoom", async (data) => {
       let teamData = data.split("|");
       let socketData = {
         code: teamData[0],
         teamCode: teamData[1],
-        team: teamData[2]
+        team: teamData[2],
       };
       let res = await verifyCode(socketData.code);
 
@@ -41,7 +41,7 @@ module.exports = class Connection {
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
         let team = {};
         let isTeamAdded = currentTeams.teams.find(
-          e => e.teamId === socketData.teamCode
+          (e) => e.teamId === socketData.teamCode
         );
 
         if (isTeamAdded) {
@@ -63,7 +63,7 @@ module.exports = class Connection {
           currentTeams.teams.push({
             teamId: socketData.teamCode,
             team: socketData.team,
-            score: 0
+            score: 0,
           });
           io.emit("response", team);
           io.emit("getWebTeams", currentTeams);
@@ -76,21 +76,21 @@ module.exports = class Connection {
         socket.emit("response", {
           message: "El código no es válido",
           stutus: false,
-          team: []
+          team: [],
         });
       }
     });
 
-    socket.on("callTeams", async data => {
-      retrieveCurrentTeams(data).then(result => {
+    socket.on("callTeams", async (data) => {
+      retrieveCurrentTeams(data).then((result) => {
         socket.emit("getTeams", { Items: result.teams });
         socket.broadcast.emit("getTeams", { Items: result.teams });
       });
     });
 
-    socket.on("onDisconnectTeam", async data => {
-      deleteATeam(data.split("|")[0], data.split("|")[1]).then(_ => {
-        retrieveCurrentTeams(data.split("|")[0]).then(result => {
+    socket.on("onDisconnectTeam", async (data) => {
+      deleteATeam(data.split("|")[0], data.split("|")[1]).then((_) => {
+        retrieveCurrentTeams(data.split("|")[0]).then((result) => {
           if (result.length > 0) {
             socket.emit("onDisconnectTeamResponse", { Items: result.teams });
             socket.emit("getTeams", { Items: result.teams });
@@ -100,11 +100,11 @@ module.exports = class Connection {
       });
     });
 
-    socket.on("startGame", data => {
+    socket.on("startGame", (data) => {
       socket.broadcast.emit("onStartGame", data);
     });
 
-    socket.on("getQuestion", async data => {
+    socket.on(" ", async (data) => {
       let basicData = data.roomInfo;
       let currentTeams = await retrieveCurrentTeams(basicData[0]);
 
@@ -120,23 +120,31 @@ module.exports = class Connection {
       currentTeam = availableTeam.shift();
       availableTeam.push(currentTeam);
 
-      teamCopy.forEach(e => {
+      teamCopy.forEach((e) => {
         Array.prototype.push.apply(answeredQuestions, e.questions);
       });
       answeredQuestions = [...new Set(answeredQuestions)];
 
-      fetch("https://socket-udem.herokuapp.com/categories/retrieveConcepts")
-        .then(res => res.json())
-        .then(async result => {
+      fetch(
+        `https://socket-udem.herokuapp.com/categories/retrieveConcept/${data.category}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: data.token,
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then(async (result) => {
           if (result.status) {
             let dummyQuestions = [];
             let findQuestion;
             if (basicData.length > 0) {
               dummyQuestions = [...result.data];
-              dummyQuestions = dummyQuestions.map(e => e._id);
+              dummyQuestions = dummyQuestions.map((e) => e._id);
 
               dummyQuestions = dummyQuestions.filter(
-                e => !answeredQuestions.includes(e)
+                (e) => !answeredQuestions.includes(e)
               );
 
               if (dummyQuestions.length > 0) {
@@ -147,7 +155,7 @@ module.exports = class Connection {
                 );
 
                 findQuestion = result.data.find(
-                  e => e._id === dummyQuestions[0]
+                  (e) => e._id === dummyQuestions[0]
                 );
               }
             }
@@ -158,14 +166,14 @@ module.exports = class Connection {
                   Items:
                     basicData.length > 0
                       ? findQuestion.categories
-                      : result.data[0].categories
+                      : result.data[0].categories,
                 },
                 time: 60000,
                 body: basicData.length > 0 ? findQuestion : result.data[0],
                 idQuestion: findQuestion._id,
                 currentTeam: currentTeam.teamId,
                 nextTeam: availableTeam[0].teamId,
-                teams: [...availableTeam].map(e => e)
+                teams: [...availableTeam].map((e) => e),
               };
 
               socket.emit("sendQuestion", bodySocket);
@@ -178,27 +186,27 @@ module.exports = class Connection {
         });
     });
 
-    socket.on("getScore", data => {
+    socket.on("getScore", (data) => {
       let myData = data.split("|");
-      addScore(myData[0], myData[1], parseInt(myData[2])).then(res => {
+      addScore(myData[0], myData[1], parseInt(myData[2])).then((res) => {
         socket.broadcast.emit("sendScore", res);
       });
     });
 
-    socket.on("onGameOver", data => {
-      changeRoomState(data).then(_ => {
+    socket.on("onGameOver", (data) => {
+      changeRoomState(data).then((_) => {
         socket.emit("gameOver", { exit: "Juego terminado" });
         socket.broadcast.emit("gameOver", { exit: "Juego terminado" });
       });
     });
 
-    socket.on("changeRoomState", data => {
-      changeRoomState(data).then(res =>
+    socket.on("changeRoomState", (data) => {
+      changeRoomState(data).then((res) =>
         socket.broadcast.emit("changeRoomStateRes", res)
       );
     });
 
-    socket.on("disconnect", async data => {
+    socket.on("disconnect", async (data) => {
       console.log("desconectado");
     });
   }
