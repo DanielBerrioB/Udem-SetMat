@@ -104,7 +104,7 @@ module.exports = class Connection {
       socket.broadcast.emit("onStartGame", data);
     });
 
-    socket.on(" ", async (data) => {
+    socket.on("getQuestion", async (data) => {
       let basicData = data.roomInfo;
       let currentTeams = await retrieveCurrentTeams(basicData[0]);
 
