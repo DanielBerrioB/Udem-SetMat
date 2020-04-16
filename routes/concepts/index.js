@@ -8,11 +8,13 @@ router.post(
   validateToken,
   controller.createConcept
 );
-router.get(
-  "/categories/getSubjects",
-  validateToken,
-  controller.retrieveSubjects
-);
+
+//router.get(
+//  "/categories/getSubjects",
+//  validateToken,
+//  controller.retrieveSubjects
+//);
+
 router.get(
   "/categories/retrieveConcept/:subject",
   validateToken,

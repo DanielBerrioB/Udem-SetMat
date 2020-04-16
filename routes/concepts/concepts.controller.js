@@ -7,7 +7,7 @@ function createConcept(req, res) {
   const { subject, concept, definition, img, categories } = req.body;
 
   if (subject && concept && definition && categories) {
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase
         .collection(collection)
         .insertOne(
@@ -18,13 +18,13 @@ function createConcept(req, res) {
               res.status(201).send({
                 status: true,
                 data: { subject, categories, concept, definition, img },
-                message: "Concepto creado con éxito"
+                message: "Concepto creado con éxito",
               });
             } else {
               res.status(404).send({
                 status: false,
                 data: [],
-                message: "Este concepto ya se encuentra registrado"
+                message: "Este concepto ya se encuentra registrado",
               });
             }
           }
@@ -33,7 +33,7 @@ function createConcept(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -43,7 +43,7 @@ function createConcept(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
@@ -51,7 +51,7 @@ function createConcept(req, res) {
 function retrieveConcept(req, res) {
   const { subject } = req.params;
   if (subject) {
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase
         .collection(collection)
         .find({ subject })
@@ -61,13 +61,13 @@ function retrieveConcept(req, res) {
             res.status(200).send({
               status: true,
               data: item,
-              message: `Concepto encontrado`
+              message: `Concepto encontrado`,
             });
           } else {
             res.status(400).send({
               status: false,
               data: [],
-              message: `No se encuentra el concepto ${subject}`
+              message: `No se encuentra el concepto ${subject}`,
             });
           }
         });
@@ -75,7 +75,7 @@ function retrieveConcept(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -85,13 +85,13 @@ function retrieveConcept(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
 
 function retrieveConcepts(req, res) {
-  let fun = dataBase =>
+  let fun = (dataBase) =>
     dataBase
       .collection(collection)
       .find()
@@ -101,13 +101,13 @@ function retrieveConcepts(req, res) {
           res.status(200).send({
             status: true,
             data: items,
-            message: "Conceptos"
+            message: "Conceptos",
           });
         } else {
           res.status(400).send({
             status: false,
             data: [],
-            message: "No se encontró ningun concepto"
+            message: "No se encontró ningun concepto",
           });
         }
       });
@@ -115,7 +115,7 @@ function retrieveConcepts(req, res) {
     const dataBase = client.db(DBName);
     fun(dataBase);
   } else {
-    client.connect(err => {
+    client.connect((err) => {
       if (err) throw err;
       const dataBase = client.db(DBName);
       fun(dataBase);
@@ -124,20 +124,20 @@ function retrieveConcepts(req, res) {
 }
 
 function retrieveSubjects(req, res) {
-  let fun = dataBase =>
+  let fun = (dataBase) =>
     dataBase.collection(collection).distinct("subject", (err, item) => {
       if (err) throw err;
       if (item.length > 0) {
         res.status(200).send({
           status: true,
           data: item,
-          message: `Subjects`
+          message: `Subjects`,
         });
       } else {
         res.status(400).send({
           status: false,
           data: [],
-          message: `No se encuentro ninguna definicion`
+          message: `No se encuentro ninguna definicion`,
         });
       }
     });
@@ -145,7 +145,7 @@ function retrieveSubjects(req, res) {
     const dataBase = client.db(DBName);
     fun(dataBase);
   } else {
-    client.connect(err => {
+    client.connect((err) => {
       if (err) throw err;
       const dataBase = client.db(DBName);
       fun(dataBase);
@@ -153,9 +153,11 @@ function retrieveSubjects(req, res) {
   }
 }
 
+
+
 module.exports = {
   createConcept,
   retrieveConcept,
   retrieveConcepts,
-  retrieveSubjects
+  retrieveSubjects,
 };
