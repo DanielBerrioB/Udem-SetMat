@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const { DBName, client } = require("../../config/mongo.config");
 const ObjectId = require("mongodb").ObjectID;
 const { isThereAnyConnection } = require("../../utils/helpers");
+const { restoreMyPassword } = require("../../utils/emailSender");
 const { createToken } = require("../../utils/auth");
 
 const collection = "users";
@@ -17,10 +18,10 @@ function createUser(req, res) {
   if (name && email && password) {
     let body = {
       name,
-      password: crypto.createHmac("sha256", password).digest("hex")
+      password: crypto.createHmac("sha256", password).digest("hex"),
     };
 
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase
         .collection(collection)
         .updateOne({ email }, { $set: body }, { upsert: true }, (err, item) => {
@@ -31,13 +32,13 @@ function createUser(req, res) {
             res.status(201).send({
               status: true,
               data: body,
-              message: "Usuario creado con éxito"
+              message: "Usuario creado con éxito",
             });
           } else {
             res.status(404).send({
               status: false,
               data: [],
-              message: "Este email ya se encuentra registrado"
+              message: "Este email ya se encuentra registrado",
             });
           }
         });
@@ -45,7 +46,7 @@ function createUser(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -55,7 +56,7 @@ function createUser(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
@@ -69,15 +70,15 @@ function createUser(req, res) {
 function logIn(req, res) {
   const { email, password } = req.body;
   if (email && password) {
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase.collection(collection).findOne(
         {
           $and: [
             {
               email,
-              password: crypto.createHmac("sha256", password).digest("hex")
-            }
-          ]
+              password: crypto.createHmac("sha256", password).digest("hex"),
+            },
+          ],
         },
         (err, user) => {
           if (err) throw err;
@@ -90,14 +91,14 @@ function logIn(req, res) {
               status: true,
               data: user,
               message: "Usuario encontrado",
-              token: token
+              token: token,
             });
           } else {
             res.status(404).send({
               status: false,
               data: [],
               message:
-                "El usuario no se encuentra registrado con estas credenciales"
+                "El usuario no se encuentra registrado con estas credenciales",
             });
           }
         }
@@ -106,7 +107,7 @@ function logIn(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -116,7 +117,7 @@ function logIn(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
@@ -130,7 +131,7 @@ function logIn(req, res) {
 function getUserInfo(req, res) {
   let { id } = req.params;
   if (id) {
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase
         .collection(collection)
         .findOne({ _id: ObjectId(id) }, (err, item) => {
@@ -140,13 +141,13 @@ function getUserInfo(req, res) {
             res.status(200).send({
               status: true,
               data: item,
-              message: `Usuario encontrado`
+              message: `Usuario encontrado`,
             });
           } else {
             res.status(404).send({
               status: false,
               data: [],
-              message: `El usuario con id ${id} no se encuentra registrado`
+              message: `El usuario con id ${id} no se encuentra registrado`,
             });
           }
         });
@@ -154,7 +155,7 @@ function getUserInfo(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -164,9 +165,55 @@ function getUserInfo(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "Necesitas el id del usuario"
+      message: "Necesitas el id del usuario",
     });
   }
 }
 
-module.exports = { logIn, createUser, getUserInfo };
+/**
+ * This function allows to restore the password when it's forgotten
+ * @param {Object} req
+ * @param {Object} res
+ */
+function restorePassword(req, res) {
+  let { email } = req.body;
+  if (email) {
+    let fun = (dataBase) =>
+      dataBase.collection(collection).findOne({ email }, (err, item) => {
+        if (err) throw err;
+        if (item) {
+          let token = createToken({ ...item });
+          restoreMyPassword(email, item.name, token);
+          res.status(200).send({
+            status: true,
+            data: item,
+            message: "El link fue enviado al correo ingresado.",
+          });
+        } else {
+          res.status(404).send({
+            status: false,
+            data: [],
+            message: `El usuario con correo ${email} no se encontró`,
+          });
+        }
+      });
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    } else {
+      client.connect((err) => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        fun(dataBase);
+      });
+    }
+  } else {
+    res.status(400).send({
+      status: false,
+      data: [],
+      message: "Necesitas el id del usuario",
+    });
+  }
+}
+
+module.exports = { logIn, createUser, getUserInfo, restorePassword };
