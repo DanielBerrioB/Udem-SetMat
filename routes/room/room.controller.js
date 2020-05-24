@@ -11,29 +11,35 @@ const collection = "room";
  * @param {Object} res
  */
 function createRoom(req, res) {
-  let { category } = req.body;
+  let { category, numMax } = req.body;
 
-  if (category) {
+  if (category && numMax) {
     let uniqueCode = generateRandomCode();
 
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase
         .collection(collection)
         .insertOne(
-          { uniqueCode, category, teams: [], availability: true },
+          { uniqueCode, category, teams: [], availability: true, numMax },
           (err, item) => {
             if (err) throw err;
             if (item.result.n > 0) {
               res.status(201).send({
                 status: true,
-                data: { uniqueCode, category, teams: [], availability: true },
-                message: "Sala creada"
+                data: {
+                  uniqueCode,
+                  category,
+                  teams: [],
+                  availability: true,
+                  numMax,
+                },
+                message: "Sala creada",
               });
             } else {
               res.status(404).send({
                 status: false,
                 data: [],
-                message: "Error no se pudo generar la sala"
+                message: "Error no se pudo generar la sala",
               });
             }
           }
@@ -42,7 +48,7 @@ function createRoom(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -52,7 +58,7 @@ function createRoom(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
@@ -60,20 +66,20 @@ function createRoom(req, res) {
 function getRoomInfo(req, res) {
   let { uniqueCode } = req.params;
   if (uniqueCode) {
-    let fun = dataBase =>
+    let fun = (dataBase) =>
       dataBase.collection(collection).findOne({ uniqueCode }, (err, item) => {
         if (err) throw err;
         if (item) {
           res.status(200).send({
             status: true,
             data: item,
-            message: "Sala encontrada"
+            message: "Sala encontrada",
           });
         } else {
           res.status(404).send({
             status: false,
             data: [],
-            message: "Error no se pudo encontrar la sala"
+            message: "Error no se pudo encontrar la sala",
           });
         }
       });
@@ -82,7 +88,7 @@ function getRoomInfo(req, res) {
       const dataBase = client.db(DBName);
       fun(dataBase);
     } else {
-      client.connect(err => {
+      client.connect((err) => {
         if (err) throw err;
         const dataBase = client.db(DBName);
         fun(dataBase);
@@ -92,7 +98,7 @@ function getRoomInfo(req, res) {
     res.status(400).send({
       status: false,
       data: [],
-      message: "No se han ingresado todos los campos"
+      message: "No se han ingresado todos los campos",
     });
   }
 }
@@ -102,7 +108,7 @@ function getRoomInfo(req, res) {
  * DANGER: JUST USE IN CASE OF DELETING ALL THE ELEMENTS
  */
 function deleteAllRooms(req, res) {
-  let fun = dataBase =>
+  let fun = (dataBase) =>
     dataBase.collection(collection).deleteMany({}, (err, _) => {
       if (err) throw err;
       res.status(200).send({ message: "Data removed" });
@@ -111,7 +117,7 @@ function deleteAllRooms(req, res) {
     const dataBase = client.db(DBName);
     fun(dataBase);
   } else {
-    client.connect(err => {
+    client.connect((err) => {
       if (err) throw err;
       const dataBase = client.db(DBName);
       fun(dataBase);

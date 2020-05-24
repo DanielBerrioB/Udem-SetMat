@@ -6,6 +6,7 @@ const {
   addScore,
   shiftAssign,
   changeRoomState,
+  getMaxTeams,
 } = require("./sockets");
 const fetch = require("node-fetch");
 const { generateRandomCode } = require("../helpers");
@@ -38,39 +39,48 @@ module.exports = class Connection {
       let res = await verifyCode(socketData.code);
 
       if (res) {
+        let maxTeams = await getMaxTeams(data.split("|")[0]);
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
-        let team = {};
-        let isTeamAdded = currentTeams.teams.find(
-          (e) => e.teamId === socketData.teamCode
-        );
-
-        if (isTeamAdded) {
-          team.message = "El equipo ya se encuentra en la sala";
-          io.emit("response", team);
-        } else if (currentTeams.teams.length < 6) {
-          team = await addTeam(
-            socketData.code,
-            socketData.teamCode,
-            socketData.team
+        if (maxTeams < currentTeams.teams.length) {
+          let team = {};
+          let isTeamAdded = currentTeams.teams.find(
+            (e) => e.teamId === socketData.teamCode
           );
-          delete team.teams;
-          team.team = socketData.teamCode;
-          if (team.status) {
-            team.message = "Equipo añadido";
+
+          if (isTeamAdded) {
+            team.message = "El equipo ya se encuentra en la sala";
+            io.emit("response", team);
+          } else if (currentTeams.teams.length < 6) {
+            team = await addTeam(
+              socketData.code,
+              socketData.teamCode,
+              socketData.team
+            );
+            delete team.teams;
+            team.team = socketData.teamCode;
+            if (team.status) {
+              team.message = "Equipo añadido";
+            } else {
+              team.message = "Error intenta de nuevo";
+            }
+            currentTeams.teams.push({
+              teamId: socketData.teamCode,
+              team: socketData.team,
+              score: 0,
+            });
+            io.emit("response", team);
+            io.emit("getWebTeams", currentTeams);
           } else {
-            team.message = "Error intenta de nuevo";
+            team.message = "Ya hay mas de seis equipos en la sala";
+            team.team = [];
+            socket.emit("response", team);
           }
-          currentTeams.teams.push({
-            teamId: socketData.teamCode,
-            team: socketData.team,
-            score: 0,
-          });
-          io.emit("response", team);
-          io.emit("getWebTeams", currentTeams);
         } else {
-          team.message = "Ya hay mas de seis equipos en la sala";
-          team.team = [];
-          socket.emit("response", team);
+          socket.emit("response", {
+            message: "La sala ya ha excedido el número máximo de participantes",
+            stutus: false,
+            team: [],
+          });
         }
       } else {
         socket.emit("response", {
