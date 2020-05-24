@@ -19,7 +19,7 @@ function restoreMyPassword(email, user, token) {
     html: ` <div>
                 <h2>Hola ${user},</h2>
                 <p>En el siguiente enlace podrás cambiar tu contraseña</p>
-                <a href=${url}/forgotPasswordRestore/user=${user}/token=${token} style="display: block;
+                <a href=${url}/forgotPasswordRestore?user=${user}&token=${token} style="display: block;
                     width: 150px;
                     height: 25px;
                     background: blue;
