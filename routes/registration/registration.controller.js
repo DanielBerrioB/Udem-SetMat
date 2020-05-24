@@ -183,10 +183,10 @@ function restorePassword(req, res) {
         if (err) throw err;
         if (item) {
           let token = createToken({ ...item });
-          restoreMyPassword(email, item.name, token);
+          restoreMyPassword(email, email, token);
           res.status(200).send({
             status: true,
-            data: item,
+            data: { email, token },
             message: "El link fue enviado al correo ingresado.",
           });
         } else {
@@ -216,4 +216,61 @@ function restorePassword(req, res) {
   }
 }
 
-module.exports = { logIn, createUser, getUserInfo, restorePassword };
+/**
+ * This functions changes
+ * @param {Object} req
+ * @param {Object} res
+ */
+function changePassword(req, res) {
+  let { email, newPassword } = req.body;
+  if (email && newPassword) {
+    let fun = (dataBase) =>
+      dataBase.collection(collection).updateOne(
+        { email },
+        {
+          $set: {
+            password: crypto.createHmac("sha256", newPassword).digest("hex"),
+          },
+        },
+        (err, item) => {
+          if (err) throw err;
+
+          if (item.result.n > 0) {
+            res.status(200).send({
+              status: true,
+              message: "Cambiado con éxito",
+            });
+          } else {
+            res.status(404).send({
+              status: false,
+              message: "El usuario no se encuentra registrado",
+            });
+          }
+        }
+      );
+    if (isThereAnyConnection(client)) {
+      const dataBase = client.db(DBName);
+      fun(dataBase);
+    } else {
+      client.connect((err) => {
+        if (err) throw err;
+        const dataBase = client.db(DBName);
+        fun(dataBase);
+      });
+    }
+  } else {
+    res.status(400).send({
+      status: false,
+      data: [],
+      message: "Necesitas el id del usuario",
+    });
+  }
+}
+
+module.exports = {
+  logIn,
+  createUser,
+  getUserInfo,
+  restorePassword,
+  changePassword,
+};
