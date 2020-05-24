@@ -3,7 +3,7 @@ const sgMail = require("@sendgrid/mail");
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const url = "https://set-mat.herokuapp.com/";
+const url = "https://set-mat.herokuapp.com";
 
 /**
  * This function sends an email to a user given the following credentials:
