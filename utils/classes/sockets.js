@@ -323,17 +323,9 @@ function getMaxTeams(code) {
         .findOne({ uniqueCode: code }, (err, item) => {
           if (err) throw err;
           if (item) {
-            resolve({
-              status: true,
-              data: item,
-              message: `Sala cerrada`,
-            });
+            resolve(item.numMax);
           } else {
-            resolve({
-              status: false,
-              item: [],
-              message: `Error intenta de nuevo`,
-            });
+            resolve(-1);
           }
         })
     );
