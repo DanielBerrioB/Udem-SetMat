@@ -42,8 +42,7 @@ module.exports = class Connection {
         let maxTeams = await getMaxTeams(data.split("|")[0]);
         let currentTeams = await retrieveCurrentTeams(data.split("|")[0]);
 
-        console.log(maxTeams, currentTeams.teams.length);
-        if (maxTeams < currentTeams.teams.length && maxTeams !== -1) {
+        if (currentTeams.teams.length < maxTeams && maxTeams !== -1) {
           let team = {};
           let isTeamAdded = currentTeams.teams.find(
             (e) => e.teamId === socketData.teamCode

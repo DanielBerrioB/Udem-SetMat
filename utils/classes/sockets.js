@@ -323,7 +323,6 @@ function getMaxTeams(code) {
         .findOne({ uniqueCode: code }, (err, item) => {
           if (err) throw err;
           if (item) {
-            console.log(item);
             resolve(item.numMax);
           } else {
             resolve(-1);
